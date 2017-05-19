@@ -122,8 +122,14 @@ class SpecialOAuth2Client extends SpecialPage {
                         }
                 }*/
 
-
                 $user = $this->userHandling($credentials);
+                if( !$user ) {
+                        $login_url = Skin::makeSpecialUrl( 'UserLogin', 'returnto='.$row['return_to'] );
+                        $wgOut->setPageTitle('Auth Error');
+                        $wgOut->addHTML('You are an internal user. Please <a href="' . $login_url . '">relogin</a> through login form.');
+                        return false;
+                }
+
                 $user->setCookies(null, null, true);
 
                 //$this->add_user_to_groups($user, $2);
@@ -217,7 +223,7 @@ class SpecialOAuth2Client extends SpecialPage {
         }
 
         private function userHandling($credentials) {
-                global $wgOAuth2Client, $wgAuth;
+                global $wgOAuth2Client;
 
                 $username       = $credentials['username'];
                 $realname       = $credentials['realname'];
@@ -237,9 +243,12 @@ class SpecialOAuth2Client extends SpecialPage {
                 }
 
                 $user = User::newFromName($username, 'creatable');
-                if( false === $user || $user->getId() != 0) {
-                        throw new MWException('Unable to create user.');
+                if( false === $user) {
+                        throw new MWException('Unable to create user: ' . $username);
+                } else if($user->getId() != 0) {
+                        return false;
                 }
+
                 if($realname) {
                         $user->setRealName($realname);
                 }
