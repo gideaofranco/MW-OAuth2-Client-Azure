@@ -25,6 +25,7 @@ class OAuth2 {
                 $this->redirect_uri        = $params["redirect_uri"];
                 $this->URL_AUTH            = $params["auth"] . "?";
                 $this->URL_TOKEN           = $params["token"] . "?";
+                $this->URL_LOGOUT          = $params["logout"] . "?";
 
                 /* OPTIONAL */
                 $this->auth_type           = isset($params["authorization_type"]) ? $params["authorization_type"] : "Bearer";
@@ -80,6 +81,16 @@ class OAuth2 {
                 $result_obj = json_decode($result, true);
 
                 return $result_obj;
+        }
+
+        public function logout($redirect_uri) {
+                $params = array(
+                        'redirect_uri' => $redirect_uri,
+                );
+                $url = $this->URL_LOGOUT . http_build_query($params);
+
+                header("Location: $url");
+                exit;
         }
 
         public function redirect($state = false) {

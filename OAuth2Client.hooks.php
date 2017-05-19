@@ -2,14 +2,12 @@
 class OAuth2ClientHooks {
 
         public static function onBeforePageDisplay( OutputPage &$out, Skin &$skin ) {
+                $script = '<link rel="stylesheet" type="text/css" href="/wiki/extensions/OAuth2Client/modules/OAuth2Client.css">';
+                $out->addHeadItem("jsonTree script", $script);
 
-            $script = '<link rel="stylesheet" type="text/css" href="/wiki/extensions/OAuth2Client/modules/OAuth2Client.css">';
-
-            $out->addHeadItem("jsonTree script", $script);
-
-            return true;
-
+                return true;
         }
+
         public static function onUserLoginForm( &$tpl ) {
                 global $wgRequest, $wgOAuth2Client;
 
@@ -26,6 +24,11 @@ class OAuth2ClientHooks {
         }
 
         public static function onUserLogout( &$user ) {
+                global $wgOut, $wgRequest;
+
+                $logout_url = Skin::makeSpecialUrlSubpage( 'OAuth2Client', 'logout', 'returnto='.$wgRequest->getVal('returnto') );
+                $wgOut->redirect($logout_url);
+
                 return true;
         }
 

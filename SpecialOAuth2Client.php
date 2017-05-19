@@ -8,7 +8,8 @@ if ( !defined( 'MEDIAWIKI' )) {
 class SpecialOAuth2Client extends SpecialPage {
 
         private $client;
-        private $table = 'oauth2_client_users';
+        private $table_user = 'oauth2_client_users';
+        private $table_state = 'oauth2_client_states';
 
         public function __construct() {
                 if( !self::OAuthEnabled() ) return;
@@ -22,6 +23,7 @@ class SpecialOAuth2Client extends SpecialPage {
                         'redirect_uri'           => $wgServer . str_replace( '$1', 'Special:OAuth2Client/callback', $wgArticlePath),
                         'auth'                   => $wgOAuth2Client['config']['auth_endpoint'],
                         'token'                  => $wgOAuth2Client['config']['token_endpoint'],
+                        'logout'                 => $wgOAuth2Client['config']['logout_endpoint'],
                         'authorization_type'     => $wgOAuth2Client['config']['auth_type'],
                         'scope'                  => ''
                 ]);
@@ -36,6 +38,9 @@ class SpecialOAuth2Client extends SpecialPage {
                         case 'callback':
                                 $this->_callback();
                                 break;
+                        case 'logout':
+                                $this->_logout();
+                                break;
                         default:
                                 $this->_default();
                                 break;
@@ -43,8 +48,17 @@ class SpecialOAuth2Client extends SpecialPage {
         }
 
         private function _logout() {
-                global $wgOAuth2Client, $wgOut, $wgUser;
-                if( $wgUser->isLoggedIn() ) $wgUser->logout();
+                global $wgOAuth2Client, $wgOut, $wgUser, $wgRequest;
+
+                /*if( $wgUser->isLoggedIn() ) { $wgUser->logout(); }*/
+                $returnto = $wgRequest->getVal('returnto');
+                if($returnto) {
+                        $title = Title::newFromText($returnto);
+                } else {
+                        $title = Title::newMainPage();
+                }
+
+                $this->client->logout($title->getFullUrl());
 
         }
 
@@ -55,7 +69,7 @@ class SpecialOAuth2Client extends SpecialPage {
                 $url   = $wgRequest->getVal('returnto');
 
                 $dbw   = wfGetDB(DB_MASTER);
-                $dbw->insert( 'github_states',
+                $dbw->insert( $this->table_state,
                         array( 'state' => $state,
                                    'return_to' => $url ),
                                    'Database::insert' );
@@ -68,18 +82,18 @@ class SpecialOAuth2Client extends SpecialPage {
 
                 $dbr = wfGetDB(DB_SLAVE);
                 $row = $dbr->selectRow(
-                        'github_states',
+                        $this->table_state,
                         '*',
                         array('state' => $wgRequest->getVal('state')));
 
-                $row = json_decode(json_encode($row),true);
+                $row = json_decode(json_encode($row), true);
                 if(!$row) {
                         //throw new MWException('States differ');
                         $this->_redirect();
                 }
 
                 $dbw = wfGetDB(DB_MASTER);
-                $dbw->delete('oauth2_client_states',
+                $dbw->delete($this->table_state,
                                          array('state' => $wgRequest->getVal('state')));
                 $dbw->begin();
 
@@ -212,7 +226,7 @@ class SpecialOAuth2Client extends SpecialPage {
                 $externalId     = $id;
                 $dbr            = wfGetDB(DB_SLAVE);
                 $row            = $dbr->selectRow(
-                        $this->table,
+                        $this->table_user,
                         '*',
                         array('external_id' => $externalId)
                 );
@@ -221,11 +235,12 @@ class SpecialOAuth2Client extends SpecialPage {
                 if($row) { // OAuth user already exists
                         return User::newFromId($row->internal_id);
                 }
+
                 $user = User::newFromName($username, 'creatable');
                 if( false === $user || $user->getId() != 0) {
                         throw new MWException('Unable to create user.');
                 }
-                if ($realname) {
+                if($realname) {
                         $user->setRealName($realname);
                 }
                 /*if ( $wgAuth->allowPasswordChange() ) {
@@ -238,7 +253,7 @@ class SpecialOAuth2Client extends SpecialPage {
                 $user->addToDatabase();
                 $dbw = wfGetDB(DB_MASTER);
                 $dbw->replace(
-                        $this->table,
+                        $this->table_user,
                         array('internal_id', 'external_id'),
                         array('internal_id' => $user->getId(),
                                   'external_id' => $externalId),
