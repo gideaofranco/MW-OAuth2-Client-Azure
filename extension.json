@@ -1,33 +1,33 @@
 {
-	"name": "OAuth2Github",
-	"version": "0.0.2",
+	"name": "MwOAuth2Client",
+	"version": "0.0.3",
 	"author": [
 		"Stefan2904 & Kasper Rynning-Tønnesen"
 	],
 	"requires": {
 		"MediaWiki": ">= 1.26.0"
 	},
-	"url": "https://www.mediawiki.org/wiki/Extension:OAuth2Github",
-	"descriptionmsg": "OAuth2 extension for MediaWiki to integrate Github as an identity provider.",
+	"url": "https://github.com/flytreeleft/MediaWiki-OAuth2-Client",
+	"descriptionmsg": "OAuth2 extension for MediaWiki to integrate OAuth2 server (Keycloak, github, etc.) as an identity provider.",
 	"license-name": "MIT",
 	"type": "auth",
 	"AutoloadClasses": {
-		"OAuth2GithubHooks": "OAuth2Github.hooks.php",
-		"SpecialOAuth2Github": "SpecialOAuth2Github.php",
+		"OAuth2ClientHooks": "OAuth2Client.hooks.php",
+		"SpecialOAuth2Client": "SpecialOAuth2Client.php",
 		"OAuth2":"OAuth2-Client/OAuth2Client.php"
 	},
 	"Hooks": {
 		"UserLogout": [
-			"OAuth2GithubHooks::onUserLogout"
+			"OAuth2ClientHooks::onUserLogout"
 		],
 		"UserLoginForm": [
-			"OAuth2GithubHooks::onUserLoginForm"
+			"OAuth2ClientHooks::onUserLoginForm"
 		],
 		"BeforePageDisplay": [
-			"OAuth2GithubHooks::onBeforePageDisplay"
+			"OAuth2ClientHooks::onBeforePageDisplay"
 		],
 		"LoadExtensionSchemaUpdates": [
-			"OAuth2GithubHooks::onLoadExtensionSchemaUpdates"
+			"OAuth2ClientHooks::onLoadExtensionSchemaUpdates"
 		]
 	},
 	"ResourceFileModulePaths": {
@@ -35,7 +35,7 @@
 		"remoteExtPath": "BoilerPlate"
 	},
 	"SpecialPages": {
-		"OAuth2Github": "SpecialOAuth2Github"
+		"OAuth2Client": "SpecialOAuth2Client"
 	},
 	"manifest_version": 1
 }
