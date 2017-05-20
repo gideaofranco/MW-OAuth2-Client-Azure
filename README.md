@@ -3,9 +3,13 @@ MediaWiki-OAuth2-Client
 
 **MediaWiki OAuth2 Client Extension**
 
-OAuth2 extension for MediaWiki to integrate OAuth2 server (Keycloak, Github, etc.) as an identity provider.
+OAuth2 extension for MediaWiki to integrate OAuth2 provider (Keycloak, Github, etc.) as an identity provider.
 
 MediaWiki implementation of the [OAuth2 Client library](https://github.com/kasperrt/OAuth2-Client).
+
+### Features
+- Log in or out with OAuth2 provider
+- Force external user login or change password through OAuth2 provider only
 
 ### Install
 
@@ -39,6 +43,7 @@ $wgOAuth2Client['client']['secret']         = '';
 $wgOAuth2Client['config']['auth_endpoint']  = ''; // Authorization URL
 $wgOAuth2Client['config']['token_endpoint'] = ''; // Token URL
 $wgOAuth2Client['config']['info_endpoint']  = ''; // URL to fetch user JSON
+$wgOAuth2Client['config']['change_endpoint']  = ''; // URL to change password
 ```
 
 Optional settings in global $wgOAuth2Client (in your `LocalSettings.php`)

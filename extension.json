@@ -8,7 +8,7 @@
                 "MediaWiki": ">= 1.26.0"
         },
         "url": "https://github.com/flytreeleft/MediaWiki-OAuth2-Client",
-        "descriptionmsg": "OAuth2 extension for MediaWiki to integrate OAuth2 server (Keycloak, github, etc.) as an identity provider.",
+        "descriptionmsg": "OAuth2 extension for MediaWiki to integrate OAuth2 provider (Keycloak, github, etc.) as an identity provider.",
         "license-name": "MIT",
         "type": "auth",
         "AutoloadClasses": {
