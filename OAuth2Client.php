@@ -35,7 +35,11 @@ if(!defined('MEDIAWIKI')) {
 
 if ( function_exists( 'wfLoadExtension' ) ) {
         wfLoadExtension( 'OAuth2Client' );
+
         // Keep i18n globals so mergeMessageFileList.php doesn't break
+        $wgOAuth2Client['config']['change_endpoint'] = '/No_changing_password_url_specified_in_$wgOAuth2Client';
+        $wgOAuth2Client['config']['service_login_link_text'] = 'Login with OAuth2 provider';
+        $wgOAuth2Client['config']['service_name'] = 'OAuth2 provider';
         #$wgGroupPermissions['group']['right']          = true /* or false */;
         #$wgGroupPermissions['oauth2']                  = $wgGroupPermissions['user'];
         # Disable for everyone.

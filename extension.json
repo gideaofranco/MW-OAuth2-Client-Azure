@@ -14,7 +14,10 @@
         "AutoloadClasses": {
                 "OAuth2ClientHooks": "OAuth2Client.hooks.php",
                 "SpecialOAuth2Client": "SpecialOAuth2Client.php",
-                "OAuth2":"OAuth2-Client/OAuth2Client.php"
+                "SpecialOAuth2ChangeCredentials": "SpecialOAuth2ChangeCredentials.php",
+                "OAuth2PreAuthenticationProvider": "OAuth2PreAuthenticationProvider.php",
+                "OAuth2Helper": "OAuth2Helper.php",
+                "OAuth2": "OAuth2-Client/OAuth2Client.php"
         },
         "Hooks": {
                 "UserLogout": [
@@ -23,6 +26,9 @@
                 "UserLoginForm": [
                         "OAuth2ClientHooks::onUserLoginForm"
                 ],
+                "GetPreferences": [
+                        "OAuth2ClientHooks::onGetPreferences"
+                ],
                 "BeforePageDisplay": [
                         "OAuth2ClientHooks::onBeforePageDisplay"
                 ],
@@ -30,12 +36,20 @@
                         "OAuth2ClientHooks::onLoadExtensionSchemaUpdates"
                 ]
         },
+        "AuthManagerAutoConfig": {
+                "preauth": {
+                        "OAuth2PreAuthenticationProvider": {
+                                "class": "OAuth2PreAuthenticationProvider"
+                        }
+                }
+        },
         "ResourceFileModulePaths": {
                 "localBasePath": "",
                 "remoteExtPath": "BoilerPlate"
         },
         "SpecialPages": {
-                "OAuth2Client": "SpecialOAuth2Client"
+                "OAuth2Client": "SpecialOAuth2Client",
+                "ChangeCredentials": "SpecialOAuth2ChangeCredentials"
         },
         "manifest_version": 1
 }

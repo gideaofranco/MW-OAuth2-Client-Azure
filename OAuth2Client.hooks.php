@@ -11,11 +11,7 @@ class OAuth2ClientHooks {
         public static function onUserLoginForm( &$tpl ) {
                 global $wgRequest, $wgOAuth2Client;
 
-                if(isset($wgOAuth2Client['config']['service_login_link_text'])) {
-                        $btn_text = $wgOAuth2Client['config']['service_login_link_text'];
-                } else {
-                        $btn_text = 'Login with OAuth2';
-                }
+                $btn_text = $wgOAuth2Client['config']['service_login_link_text'];
                 $btn_link = Skin::makeSpecialUrlSubpage( 'OAuth2Client', 'redirect', 'returnto='.$wgRequest->getVal('returnto') );
 
                 $header = $tpl->get( 'header' );
@@ -30,6 +26,24 @@ class OAuth2ClientHooks {
                 $wgOut->redirect($logout_url);
 
                 return true;
+        }
+
+        // Change reset password link address to OAuth2 provider's
+        public static function onGetPreferences( $user, &$defaultPreferences ) {
+                global $wgOAuth2Client;
+
+                if(OAuth2Helper::isExternalUser($user) && $defaultPreferences['password']) {
+                        $url = $wgOAuth2Client['config']['change_endpoint'];
+                        // https://github.com/wikimedia/mediawiki-extensions-GlobalPreferences/blob/master/GlobalPreferences.hooks.php
+                        $link = '<a href="' . $url . '" target="_blank">' . wfMessage( 'prefs-resetpass' )->escaped() . '</a>';
+                        $defaultPreferences['password'] = [
+                                'type' => 'info',
+                                'raw' => true,
+                                'default' => $link,
+                                'label-message' => 'yourpassword',
+                                'section' => 'personal/info',
+                        ];
+                }
         }
 
         public static function getOAuth2VendorClassPath() {
