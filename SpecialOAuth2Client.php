@@ -65,7 +65,7 @@ class SpecialOAuth2Client extends SpecialPage {
         private function _redirect() {
                 global $wgRequest;
 
-                $state = uniqid('', true);
+                $state = MWCryptRand::generateHex( 32 );//uniqid('', true);
                 $url   = $wgRequest->getVal('returnto');
 
                 $dbw   = wfGetDB(DB_MASTER);
@@ -133,6 +133,7 @@ class SpecialOAuth2Client extends SpecialPage {
                 $user->setCookies(null, null, true);
 
                 //$this->add_user_to_groups($user, $2);
+                $this->setSessionDataForUser($user);
 
                 if($row['return_to']) {
                         $title = Title::newFromText($row['return_to']);
@@ -229,12 +230,12 @@ class SpecialOAuth2Client extends SpecialPage {
                 $realname       = $credentials['realname'];
                 $id             = $credentials['id'];
                 $email          = $credentials['email'];
-                $externalId     = $id;
+                $external_id     = $id;
                 $dbr            = wfGetDB(DB_SLAVE);
                 $row            = $dbr->selectRow(
                         $this->table_user,
                         '*',
-                        array('external_id' => $externalId)
+                        array('external_id' => $external_id)
                 );
 
                 // https://doc.wikimedia.org/mediawiki-core/master/php/classUser.html
@@ -265,7 +266,7 @@ class SpecialOAuth2Client extends SpecialPage {
                         $this->table_user,
                         array('internal_id', 'external_id'),
                         array('internal_id' => $user->getId(),
-                                  'external_id' => $externalId),
+                                  'external_id' => $external_id),
                         __METHOD__);
                 return $user;
         }
@@ -280,4 +281,27 @@ class SpecialOAuth2Client extends SpecialPage {
                 );
         }
 
+        // https://doc.wikimedia.org/mediawiki-core/master/php/AuthManager_8php_source.html#l02370
+        // Update authenticate timestamp to make sure AuthManager#securitySensitiveOperationStatus return AuthManager::SEC_OK
+        // after the user was authorized by OAuth2 provider.
+        private function setSessionDataForUser( $user, $remember = null ) {
+                global $wgRequest;
+
+                $session = $wgRequest->getSession();
+                $delay = $session->delaySave();
+
+                $session->resetId();
+                $session->resetAllTokens();
+                if ( $session->canSetUser() ) {
+                        $session->setUser( $user );
+                }
+                if ( $remember !== null ) {
+                        $session->setRememberUser( $remember );
+                }
+                $session->set( 'AuthManager:lastAuthId', $user->getId() );
+                $session->set( 'AuthManager:lastAuthTimestamp', time() );
+                $session->persist();
+
+                \Wikimedia\ScopedCallback::consume( $delay );
+        }
 }
