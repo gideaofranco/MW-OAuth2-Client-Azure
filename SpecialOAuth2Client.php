@@ -10,6 +10,7 @@ class SpecialOAuth2Client extends SpecialPage {
         private $client;
         private $table_user = 'oauth2_client_users';
         private $table_state = 'oauth2_client_states';
+        private $db_read_index;
 
         public function __construct() {
                 if( !self::OAuthEnabled() ) return;
@@ -17,6 +18,15 @@ class SpecialOAuth2Client extends SpecialPage {
                 parent::__construct('OAuth2Client');
                 global $wgOAuth2Client, $wgServer, $wgArticlePath;
 
+                // https://www.mediawiki.org/wiki/Manual:Database_access#Database_Abstraction_Layer
+                // https://doc.wikimedia.org/mediawiki-core/master/php/GlobalFunctions_8php.html#aaee9057ac6cf79cb4bf9ad71c5ecc909
+                // Note: DB_SLAVE is already deprecated since 1.28 and replaced by DB_REPLICA:
+                // https://doc.wikimedia.org/mediawiki-core/master/php/Defines_8php.html#af9a09ab91a9583e960a610723f5f4330
+                if ( defined( 'DB_REPLICA' )) {
+                        $this->db_read_index = DB_REPLICA;
+                } else {
+                        $this->db_read_index = DB_SLAVE;
+                }
                 $this->client = new OAuth2([
                         'client_id'              => $wgOAuth2Client['client']['id'],
                         'client_secret'          => $wgOAuth2Client['client']['secret'],
@@ -69,37 +79,39 @@ class SpecialOAuth2Client extends SpecialPage {
                 $url   = $wgRequest->getVal('returnto');
 
                 $dbw   = wfGetDB(DB_MASTER);
-                $dbw->insert( $this->table_state,
-                        array( 'state' => $state,
-                                   'return_to' => $url ),
-                                   'Database::insert' );
                 $dbw->begin();
+                $res = $dbw->insert( $this->table_state,
+                        array( 'state' => $state,
+                                   'return_to' => $url ) );
+                $dbw->commit();
+
                 $this->client->redirect($state);
         }
 
         private function _callback() {
                 global $wgOAuth2Client, $wgOut, $wgRequest;
 
-                $dbr = wfGetDB(DB_SLAVE);
+                $dbr = wfGetDB($this->db_read_index);
                 $row = $dbr->selectRow(
                         $this->table_state,
                         '*',
                         array('state' => $wgRequest->getVal('state')));
 
-                $row = json_decode(json_encode($row), true);
+                $row = json_decode(json_encode($row), true); // Parse the row to JSON object
                 if(!$row) {
-                        //throw new MWException('States differ');
-                        $this->_redirect();
+                        //$this->_redirect();
+                        throw new ErrorPageError('Auth Error', 'States differ');
                 }
 
                 $dbw = wfGetDB(DB_MASTER);
-                $dbw->delete($this->table_state,
-                                         array('state' => $wgRequest->getVal('state')));
                 $dbw->begin();
+                $dbw->delete($this->table_state,
+                                array('state' => $wgRequest->getVal('state')));
+                $dbw->commit();
 
                 $access_token = $this->client->get_access_token();
                 if( !$access_token ) {
-                        throw new MWException('Something went wrong fetching the access token');
+                        throw new ErrorPageError('Auth Error', 'Something went wrong fetching the access token');
                 }
 
                 $credentials = $this->fix_return($this->client->get_identity($access_token, $wgOAuth2Client['config']['info_endpoint']));
@@ -231,7 +243,7 @@ class SpecialOAuth2Client extends SpecialPage {
                 $id             = $credentials['id'];
                 $email          = $credentials['email'];
                 $external_id     = $id;
-                $dbr            = wfGetDB(DB_SLAVE);
+                $dbr            = wfGetDB($this->db_read_index);
                 $row            = $dbr->selectRow(
                         $this->table_user,
                         '*',
@@ -262,12 +274,15 @@ class SpecialOAuth2Client extends SpecialPage {
                 }
                 $user->addToDatabase();
                 $dbw = wfGetDB(DB_MASTER);
+                $dbw->begin();
                 $dbw->replace(
                         $this->table_user,
                         array('internal_id', 'external_id'),
                         array('internal_id' => $user->getId(),
                                   'external_id' => $external_id),
                         __METHOD__);
+                $dbw->commit();
+
                 return $user;
         }
 

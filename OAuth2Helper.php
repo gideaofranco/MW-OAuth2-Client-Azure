@@ -9,7 +9,11 @@ class OAuth2Helper {
                         $internal_id = User::idFromName( $user->getName() );
                 }
 
-                $dbr = wfGetDB(DB_SLAVE);
+                if ( defined( 'DB_REPLICA' )) {
+                        $dbr = wfGetDB(DB_REPLICA);
+                } else {
+                        $dbr = wfGetDB(DB_SLAVE);
+                }
                 $row = $dbr->selectRow(
                         'oauth2_client_users',
                         '*',
