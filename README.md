@@ -1,23 +1,22 @@
-MediaWiki-OAuth2-Client
-==========================
-
-**MediaWiki OAuth2 Client Extension**
+MediaWiki OAuth2 Client Extension
+========================================
 
 OAuth2 extension for MediaWiki to integrate OAuth2 provider (Keycloak, Github, etc.) as an identity provider.
 
 MediaWiki implementation of the [OAuth2 Client library](https://github.com/kasperrt/OAuth2-Client).
 
-### Features
-- Log in or out with OAuth2 provider
-- Force external user login or change password through OAuth2 provider only
+## Features
 
-### Install
+- Login or logout with OAuth2 provider.
+- Force external user to login or change password through OAuth2 provider only.
+- The external users will not replace the internal users, and the internal users can login/logout via the MediaWiki way.
+
+## Install
 
 First, clone this repository to `extensions` directory in the mediawiki's root directory:
 
 ```bash
-$ cd extensions
-$ git clone https://github.com/flytreeleft/MediaWiki-OAuth2-Client.git
+git clone https://github.com/flytreeleft/MediaWiki-OAuth2-Client.git extensions/MediaWiki-OAuth2-Client
 ```
 
 Then, load the plugin by putting the following line into your `LocalSettings.php`:
@@ -26,48 +25,84 @@ Then, load the plugin by putting the following line into your `LocalSettings.php
 wfLoadExtension( 'MediaWiki-OAuth2-Client' );
 ```
 
-Finally, run [update.php](https://www.mediawiki.org/wiki/Manual:Update.php) to create the extra tables:
+Finally, run [maintenance/update.php](https://www.mediawiki.org/wiki/Manual:Update.php) to create the extra tables:
 
 ```bash
-$ cd maintenance
-$ php update.php
+php maintenance/update.php
 ```
 
-### Configuration
+## Configuration
 
-Required settings in global $wgOAuth2Client (in your `LocalSettings.php`):
+Required settings in global `$wgOAuth2Client` in your `LocalSettings.php`(Example for Keycloak users):
 
 ```php
-$wgOAuth2Client['client']['id']             = '';
-$wgOAuth2Client['client']['secret']         = '';
-$wgOAuth2Client['config']['auth_endpoint']  = ''; // Authorization URL
-$wgOAuth2Client['config']['token_endpoint'] = ''; // Token URL
-$wgOAuth2Client['config']['info_endpoint']  = ''; // URL to fetch user JSON
-$wgOAuth2Client['config']['change_endpoint']  = ''; // URL to change password
+# The client id, e.g. mediawiki
+$wgOAuth2Client['client']['id']             = 'mediawiki';
+# First, change the 'Access Type' to 'confidential' in the client settings of Keycloak,
+# then, switch to the 'Credentials' tab and copy the value of 'Secret'.
+$wgOAuth2Client['client']['secret']         = 'xxx-xx-xxx-xx';
+
+# Access the URL 'https://<keycloak server>/auth/realms/<realm name>/.well-known/openid-configuration' to get the endpoints.
+# Authorization URL which is 'authorization_endpoint'
+$wgOAuth2Client['config']['auth_endpoint']  = 'https://<keycloak server>/auth/realms/<realm name>/protocol/openid-connect/auth';
+# Token URL which is 'token_endpoint'
+$wgOAuth2Client['config']['token_endpoint'] = 'https://<keycloak server>/auth/realms/<realm name>/protocol/openid-connect/token';
+# Logout URL which is 'end_session_endpoint'
+$wgOAuth2Client['config']['logout_endpoint']  = 'https://<keycloak server>/auth/realms/<realm name>/protocol/openid-connect/logout';
+# User info URL which is 'userinfo_endpoint'
+$wgOAuth2Client['config']['info_endpoint']  = 'https://<keycloak server>/auth/realms/<realm name>/protocol/openid-connect/userinfo';
+# The URL to change password
+$wgOAuth2Client['config']['change_endpoint']  = 'https://<keycloak server>/auth/realms/<realm name>/account/password';
 ```
 
-Optional settings in global $wgOAuth2Client (in your `LocalSettings.php`)
+Optional settings in global `$wgOAuth2Client` in your `LocalSettings.php`:
 
 ```php
 $wgOAuth2Client['config']['service_name'] = '<Server name>';
 $wgOAuth2Client['config']['service_login_link_text'] = '<Login button text>';
 ```
 
-The callback url back to your wiki would be:
+**Note**: The callback URL to use when the OAuth2 provider needs to redirect or link back to the MediaWiki after login successfully would be: `http://your.wiki.domain/path/to/wiki/Special:OAuth2Client/callback`. Copy the URL to the 'Base URL' field in the client settings of Keycloak.
 
-    http://your.wiki.domain/path/to/wiki/Special:OAuth2Client/callback
+## Anonymous access denied wiki?
 
-### Closed wiki?
-
-If your Wiki is completely closed (login required for every page), you need to whitelist the plugin's hook:
+If your Wiki is completely closed for anonymous (login required for every page):
 
 ```php
-// whitelist oauth hooks for non-authed users:
-$wgWhitelistRead = array('Special:OAuth2Client');
+# https://www.mediawiki.org/wiki/Manual:Preventing_access
+# Disable reading by anonymous users
+$wgGroupPermissions['*']['read'] = false;
+# Disable anonymous editing
+$wgGroupPermissions['*']['edit'] = false;
+# Anonymous users can't create pages
+$wgGroupPermissions['*']['createpage'] = false;
+# Prevent new user registrations except by sysops
+$wgGroupPermissions['*']['createaccount'] = false;
 ```
 
+You need to add the plugin's hook to the whitelists:
 
-### License
+```php
+# Allow anonymous to access the login and auth page
+# If you are using a content language other than English, you may need to use the translated special page names instead of their English names.
+# e.g. `$wgWhitelistRead = array ("特殊:OAuth2Client")` for Chinese
+# More detials in https://www.mediawiki.org/wiki/Manual:$wgWhitelistRead
+$wgWhitelistRead = array ("Help:Contents", "Special:Userlogin", "Special:OAuth2Client");
+```
+
+## License
 
 MIT
 
+## Thanks
+
+- [LosFuzzys/MediaWiki-OAuth2-Github](https://github.com/LosFuzzys/MediaWiki-OAuth2-Github)
+- [kasperrt/OAuth2-Client](https://github.com/kasperrt/OAuth2-Client)
+
+## References
+
+- [MediaWiki Preventing Access](https://www.mediawiki.org/wiki/Manual:Preventing_access)
+- [MediaWiki $wgWhitelistRead](https://www.mediawiki.org/wiki/Manual:$wgWhitelistRead)
+- [MediaWiki $wgResourceModules](https://www.mediawiki.org/wiki/Manual:$wgResourceModules)
+- [MediaWiki Developing Extensions ](https://www.mediawiki.org/wiki/Manual:Developing_extensions)
+- [MediaWiki Developing with ResourceLoader](https://www.mediawiki.org/wiki/ResourceLoader/Developing_with_ResourceLoader)
