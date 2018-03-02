@@ -90,7 +90,7 @@ class OAuth2 {
                 $url = $this->URL_LOGOUT . http_build_query($params);
 
                 header("Location: $url");
-                exit;
+                return true;
         }
 
         public function redirect($state = false) {
@@ -108,7 +108,7 @@ class OAuth2 {
                 $url = $this->URL_AUTH . http_build_query($params);
 
                 header("Location: $url");
-                exit;
+                return true;
         }
 
 
