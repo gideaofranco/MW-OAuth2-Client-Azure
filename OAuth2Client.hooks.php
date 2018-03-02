@@ -2,8 +2,12 @@
 class OAuth2ClientHooks {
 
         public static function onBeforePageDisplay( OutputPage &$out, Skin &$skin ) {
-                $script = '<link rel="stylesheet" type="text/css" href="/wiki/extensions/OAuth2Client/modules/OAuth2Client.css">';
-                $out->addHeadItem("jsonTree script", $script);
+                // https://www.mediawiki.org/wiki/Manual:Hooks/BeforePageDisplay
+                // https://www.mediawiki.org/wiki/ResourceLoader/Developing_with_ResourceLoader
+                // https://www.mediawiki.org/wiki/Manual:Developing_extensions#Making_your_extension_user_configurable
+                // https://www.mediawiki.org/wiki/Manual:$wgResourceModules#Examples
+                // https://doc.wikimedia.org/mediawiki-core/master/php/classOutputPage.html#a3de49a57fa4ab4d408afa0bf7d485dfb
+                $out->addModules( [ 'ext.MwOAuth2Client' ] ); // Load scripts and styles
 
                 return true;
         }
@@ -15,7 +19,7 @@ class OAuth2ClientHooks {
                 $btn_link = Skin::makeSpecialUrlSubpage( 'OAuth2Client', 'redirect', 'returnto='.$wgRequest->getVal('returnto') );
 
                 $header = $tpl->get( 'header' );
-                $header .= '<a class="mw-ui-button dataporten-button" href="' . $btn_link . '">' . $btn_text . '</a>';
+                $header .= '<a class="mw-htmlform-submit mw-ui-button mw-ui-primary dataporten-button" href="' . $btn_link . '">' . $btn_text . '</a>';
                 $tpl->set( 'header', $header );
         }
 
