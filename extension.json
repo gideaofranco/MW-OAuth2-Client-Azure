@@ -1,8 +1,10 @@
 {
         "name": "MwOAuth2Client",
         "version": "0.0.3",
+        "manifest_version": 1,
         "author": [
-                "Stefan2904 & Kasper Rynning-Tønnesen"
+                "Stefan2904 & Kasper Rynning-Tønnesen",
+                "flytreeleft <flytreeleft@126.com>"
         ],
         "requires": {
                 "MediaWiki": ">= 1.26.0"
@@ -43,13 +45,21 @@
                         }
                 }
         },
-        "ResourceFileModulePaths": {
-                "localBasePath": "",
-                "remoteExtPath": "BoilerPlate"
-        },
         "SpecialPages": {
                 "OAuth2Client": "SpecialOAuth2Client",
                 "ChangeCredentials": "SpecialOAuth2ChangeCredentials"
         },
-        "manifest_version": 1
+        "ResourceFileModulePaths": {
+                "localBasePath": "modules",
+                "remoteExtPath": "MediaWiki-OAuth2-Client/modules"
+        },
+        "ResourceModules": {
+            "ext.MwOAuth2Client": {
+                "scripts": [],
+                "styles": [
+                        "OAuth2Client.css"
+                ],
+                "messages": []
+            }
+        }
 }
