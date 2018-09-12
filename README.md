@@ -66,7 +66,7 @@ $wgOAuth2Client['config']['service_name'] = '<Server name>';
 $wgOAuth2Client['config']['service_login_link_text'] = '<Login button text>';
 ```
 
-**Note**: The callback URL to use when the OAuth2 provider needs to redirect or link back to the MediaWiki after login successfully would be: `http://your.wiki.domain/path/to/wiki/Special:OAuth2Client/callback`. Copy the URL to the 'Base URL' field in the client settings of Keycloak. Observer the config parameter redirect_uri if you change the original language.
+**Note**: The callback URL to use when the OAuth2 provider needs to redirect or link back to the MediaWiki after login successfully would be: `http://your.wiki.domain/path/to/wiki/Special:OAuth2Client/callback`. Copy the URL to the 'Base URL' field in the client settings of Keycloak. Notice the config parameter redirect_uri if you change the default language.
 
 ## Anonymous access denied wiki?
 
