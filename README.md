@@ -53,6 +53,10 @@ $wgOAuth2Client['config']['logout_endpoint']  = 'https://<keycloak server>/auth/
 $wgOAuth2Client['config']['info_endpoint']  = 'https://<keycloak server>/auth/realms/<realm name>/protocol/openid-connect/userinfo';
 # The URL to change password
 $wgOAuth2Client['config']['change_endpoint']  = 'https://<keycloak server>/auth/realms/<realm name>/account/password';
+# The OAuth scope if you use. Leave black if you dont use.
+$wgOAuth2Client['config']['scope']  = 'openid email User.Read';
+# The Special page redirect, if your language is not the Default
+$wgOAuth2Client['config']['redirect_uri']  = 'Special:OAuth2Client/callback';
 ```
 
 Optional settings in global `$wgOAuth2Client` in your `LocalSettings.php`:
@@ -62,7 +66,7 @@ $wgOAuth2Client['config']['service_name'] = '<Server name>';
 $wgOAuth2Client['config']['service_login_link_text'] = '<Login button text>';
 ```
 
-**Note**: The callback URL to use when the OAuth2 provider needs to redirect or link back to the MediaWiki after login successfully would be: `http://your.wiki.domain/path/to/wiki/Special:OAuth2Client/callback`. Copy the URL to the 'Base URL' field in the client settings of Keycloak.
+**Note**: The callback URL to use when the OAuth2 provider needs to redirect or link back to the MediaWiki after login successfully would be: `http://your.wiki.domain/path/to/wiki/Special:OAuth2Client/callback`. Copy the URL to the 'Base URL' field in the client settings of Keycloak. Observer the config parameter redirect_uri if you change the original language.
 
 ## Anonymous access denied wiki?
 

@@ -30,12 +30,12 @@ class SpecialOAuth2Client extends SpecialPage {
                 $this->client = new OAuth2([
                         'client_id'              => $wgOAuth2Client['client']['id'],
                         'client_secret'          => $wgOAuth2Client['client']['secret'],
-                        'redirect_uri'           => $wgServer . str_replace( '$1', 'Special:OAuth2Client/callback', $wgArticlePath),
+                        'redirect_uri'           => $wgServer . str_replace( '$1', $wgOAuth2Client['config']['redirect_uri'], $wgArticlePath),
                         'auth'                   => $wgOAuth2Client['config']['auth_endpoint'],
                         'token'                  => $wgOAuth2Client['config']['token_endpoint'],
                         'logout'                 => $wgOAuth2Client['config']['logout_endpoint'],
                         'authorization_type'     => $wgOAuth2Client['config']['auth_type'],
-                        'scope'                  => ''
+                        'scope'                  => $wgOAuth2Client['config']['scope']
                 ]);
         }
 
