@@ -76,7 +76,7 @@ class OAuth2 {
                         'access_token' => $access_token,
                 );
                 $url_params = http_build_query($params);
-                $url        = $identity_url . "?" . $url_params;
+                $url        = $identity_url;// . "?" . $url_params;
                 $header     = array('Authorization: ' . $this->auth_type . ' ' . $access_token, 'Accept: application/json');
                 $result     = curl_exec($this->create_curl($url, $header, false));
                 $result_obj = json_decode($result, true);
