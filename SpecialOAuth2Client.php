@@ -175,6 +175,8 @@ class SpecialOAuth2Client extends SpecialPage {
         private function fix_return($response) {
                 global $wgOAuth2Client;
 
+                wfErrorLog( json_encode( $response ), '/var/log/mediawiki/my-custom-debug.log' );
+                
                 if(isset($response['username'])) {
                         $username = $response['username'];
                 } else if(isset($response['preferred_username'])) { // For Keycloak

@@ -62,6 +62,7 @@ class OAuth2 {
                 $url          = $this->URL_TOKEN;// . $url_params;
                 // NOTE: Passing url encoded params as post fields. If passing array params, the keycloak cannot accept them.
                 $result       = curl_exec($this->create_curl($url, array('Accept: application/json'), $url_params));
+                wfErrorLog( $result, '/var/log/mediawiki/my-custom-debug.log' );
                 $result_obj   = json_decode($result, true);
                 $access_token = $result_obj['access_token'];
                 //$expires_in   = $result_obj['expires_in'];

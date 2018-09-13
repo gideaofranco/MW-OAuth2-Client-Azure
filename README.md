@@ -37,32 +37,34 @@ Required settings in global `$wgOAuth2Client` in your `LocalSettings.php`(Exampl
 
 ```php
 # The client id, e.g. mediawiki
-$wgOAuth2Client['client']['id']             = 'mediawiki';
+$wgOAuth2Client['client']['id']              = 'mediawiki';
 # First, change the 'Access Type' to 'confidential' in the client settings of Keycloak,
 # then, switch to the 'Credentials' tab and copy the value of 'Secret'.
-$wgOAuth2Client['client']['secret']         = 'xxx-xx-xxx-xx';
+$wgOAuth2Client['client']['secret']          = 'xxx-xx-xxx-xx';
 
 # Access the URL 'https://<keycloak server>/auth/realms/<realm name>/.well-known/openid-configuration' to get the endpoints.
 # Authorization URL which is 'authorization_endpoint'
-$wgOAuth2Client['config']['auth_endpoint']  = 'https://<keycloak server>/auth/realms/<realm name>/protocol/openid-connect/auth';
+$wgOAuth2Client['config']['auth_endpoint']   = 'https://<keycloak server>/auth/realms/<realm name>/protocol/openid-connect/auth';
 # Token URL which is 'token_endpoint'
-$wgOAuth2Client['config']['token_endpoint'] = 'https://<keycloak server>/auth/realms/<realm name>/protocol/openid-connect/token';
+$wgOAuth2Client['config']['token_endpoint']  = 'https://<keycloak server>/auth/realms/<realm name>/protocol/openid-connect/token';
 # Logout URL which is 'end_session_endpoint'
-$wgOAuth2Client['config']['logout_endpoint']  = 'https://<keycloak server>/auth/realms/<realm name>/protocol/openid-connect/logout';
+$wgOAuth2Client['config']['logout_endpoint'] = 'https://<keycloak server>/auth/realms/<realm name>/protocol/openid-connect/logout';
 # User info URL which is 'userinfo_endpoint'
-$wgOAuth2Client['config']['info_endpoint']  = 'https://<keycloak server>/auth/realms/<realm name>/protocol/openid-connect/userinfo';
+$wgOAuth2Client['config']['info_endpoint']   = 'https://<keycloak server>/auth/realms/<realm name>/protocol/openid-connect/userinfo';
 # The URL to change password
-$wgOAuth2Client['config']['change_endpoint']  = 'https://<keycloak server>/auth/realms/<realm name>/account/password';
+$wgOAuth2Client['config']['change_endpoint'] = 'https://<keycloak server>/auth/realms/<realm name>/account/password';
+
+$wgOAuth2Client['config']['auth_type']       = 'token';
 # The OAuth scope if you use. Leave black if you dont use.
-$wgOAuth2Client['config']['scope']  = 'openid email User.Read';
+$wgOAuth2Client['config']['scope']           = 'openid email User.Read';
 # The Special page redirect, if your language is not the Default
-$wgOAuth2Client['config']['redirect_uri']  = 'Special:OAuth2Client/callback';
+$wgOAuth2Client['config']['redirect_uri']    = 'Special:OAuth2Client/callback';
 ```
 
 Optional settings in global `$wgOAuth2Client` in your `LocalSettings.php`:
 
 ```php
-$wgOAuth2Client['config']['service_name'] = '<Server name>';
+$wgOAuth2Client['config']['service_name']            = '<Server name>';
 $wgOAuth2Client['config']['service_login_link_text'] = '<Login button text>';
 ```
 
