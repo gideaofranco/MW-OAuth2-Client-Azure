@@ -183,7 +183,7 @@ class SpecialOAuth2Client extends SpecialPage {
                 } else if(isset($response['user']['name'])) {
                         $username = $response['user']['name'];
                 } else if(isset($response['mail'])) {
-                        $arr = split('@', $response['mail']);
+                        $arr = split('\@', $response['mail']);
                         $username = $arr[0];
                 } else {
                         $username = null;
