@@ -326,6 +326,6 @@ class SpecialOAuth2Client extends SpecialPage {
                 $session->set( 'AuthManager:lastAuthTimestamp', time() );
                 $session->persist();
 
-                \Wikimedia\ScopedCallback::consume( $delay );
+                //\Wikimedia\ScopedCallback::consume( $delay );
         }
 }
