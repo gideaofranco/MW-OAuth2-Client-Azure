@@ -182,6 +182,8 @@ class SpecialOAuth2Client extends SpecialPage {
                         $username = $response['preferred_username'];
                 } else if(isset($response['user']['name'])) {
                         $username = $response['user']['name'];
+                } else if(isset($response['mail'])) {
+                        $username = $response['mail'];
                 } else {
                         $username = null;
                 }
@@ -193,6 +195,9 @@ class SpecialOAuth2Client extends SpecialPage {
                         } else {
                                 $realname = $response['name'];
                         }
+                }
+                else if(isset($response['displayName'])) {
+                        $realname = $response['displayName'];
                 } else {
                         $realname = null;
                 }
@@ -215,6 +220,8 @@ class SpecialOAuth2Client extends SpecialPage {
                         $email = $response['email'];
                 } else if(isset($response['user']['email'])) {
                         $email = $response['user']['email'];
+                } else if(isset($response['mail'])) {
+                        $email = $response['mail'];
                 } else {
                         $email = null;
                 }
