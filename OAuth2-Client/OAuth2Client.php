@@ -101,8 +101,7 @@ class OAuth2 {
                         'response_type' => $this->response_type,
                         'redirect_uri'  => $this->redirect_uri,
                         'scope'         => $this->scope,
-                        'state'         => $state,
-                        'resource'      => 'https://graph.microsoft.com'
+                        'state'         => $state
                 );
 
                 if($this->session) $_SESSION['state'] = $state;
